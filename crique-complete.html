@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#090b12"><title>CRIQUE — Level up together</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{color-scheme:dark;--bg:#090b12;--panel:#111522;--line:#242b3b;--muted:#8992a8;--text:#f4f6fb;--lime:#c6f36a;--cyan:#73e0d2}*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 75% -10%,#1c2940 0,transparent 40%),var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh}h1,h2,h3,.brand{font-family:'Space Grotesk',sans-serif}.panel{background:linear-gradient(145deg,rgba(20,26,41,.97),rgba(14,18,29,.97));border:1px solid var(--line);border-radius:20px}.muted{color:var(--muted)}.lime{color:var(--lime)}.btn{border:1px solid var(--line);border-radius:12px;padding:10px 14px;transition:.2s;background:#171d2b}.btn:hover{transform:translateY(-1px);border-color:#59647a}.btn-primary{background:var(--lime);color:#11170a;border-color:var(--lime);font-weight:800}.btn-primary:hover{background:#d5ff7d}.nav-btn{color:#929bb0;padding:11px 13px;border-radius:12px;white-space:nowrap}.nav-btn.active{background:#242d3d;color:var(--lime)}.task{border:1px solid #252d3d;background:#141a28;border-radius:14px;padding:13px;display:flex;align-items:center;gap:12px}.task.done{opacity:.62}.task.done .task-title{text-decoration:line-through}.check{width:22px;height:22px;border-radius:7px;border:1.5px solid #58647b;display:grid;place-items:center;flex:none}.task.done .check{background:var(--lime);border-color:var(--lime);color:#10150a}.tag{font-size:11px;padding:4px 8px;border-radius:99px;background:#222b3b;color:#aeb9cc}.bar{height:8px;background:#293144;border-radius:20px;overflow:hidden}.bar>span{display:block;height:100%;border-radius:20px;background:linear-gradient(90deg,var(--lime),var(--cyan));transition:width .4s}.stat{font-family:'Space Grotesk';font-size:27px;font-weight:700}.tab-content{display:none}.tab-content.active{display:block;animation:rise .25s ease}@keyframes rise{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:none}}.ring{background:conic-gradient(var(--lime) var(--progress,0%),#283144 0);border-radius:50%;padding:9px}.ring-inner{border-radius:50%;background:#111522;display:grid;place-items:center;width:100%;height:100%}.quote{background:linear-gradient(120deg,rgba(198,243,106,.12),rgba(115,224,210,.05));border:1px solid rgba(198,243,106,.2)}.field{background:#0c111c;border:1px solid #2a3448;border-radius:11px;padding:11px 12px;color:white;width:100%;outline:none}.field:focus{border-color:var(--lime)}.focus-mode{position:fixed;inset:0;z-index:50;background:radial-gradient(ellipse at 50% 20%,#1e3040,#080b12 65%);display:none;align-items:center;justify-content:center;padding:24px;text-align:center}.focus-mode.show{display:flex}.focus-time{font-family:'Space Grotesk';font-size:clamp(64px,13vw,130px);font-weight:700;letter-spacing:-.07em}.toast{position:fixed;bottom:22px;left:50%;transform:translate(-50%,20px);opacity:0;pointer-events:none;background:#e1ff9d;color:#11170a;padding:12px 18px;border-radius:12px;font-weight:700;z-index:90;transition:.25s}.toast.show{opacity:1;transform:translate(-50%,0)}.hide-scroll::-webkit-scrollbar{display:none}.avatar{width:38px;height:38px;border-radius:13px;background:#29364a;display:grid;place-items:center;color:var(--lime);font-weight:800}@media(min-width:1024px){.app-shell{max-width:1320px;margin:auto;padding:28px 34px}.main-grid{grid-template-columns:minmax(0,1.55fr) minmax(300px,.8fr)}}@media(max-width:640px){.panel{border-radius:16px}.app-shell{padding:16px}.stat{font-size:23px}}
+
+/* Crique login — matchar referensbilden */
+#authScreen{min-height:100svh;padding:34px 18px;background:radial-gradient(ellipse at 76% 7%,rgba(31,46,72,.48),transparent 42%),#090b12}
+#authScreen>.panel{width:100%;max-width:775px;padding:42px 44px 44px;border-radius:28px;background:linear-gradient(145deg,#141a29 0%,#101521 100%);border:1.5px solid #273044;box-shadow:0 24px 80px rgba(0,0,0,.22)}
+#authScreen .brand{font-size:40px;line-height:1.05;letter-spacing:-1.5px}
+#authScreen .brand+div{font-size:15px;letter-spacing:2px;margin-top:8px}
+#authScreen .w-12.h-12{width:88px;height:88px;border-radius:27px;font-size:36px;flex:none}
+#authScreen .mb-7{margin-bottom:54px}
+#authTitle{font-size:42px;line-height:1.15;margin-bottom:18px;letter-spacing:-1px}
+#authSubtitle{font-size:23px;margin-bottom:44px}
+#authForm{display:flex;flex-direction:column;gap:24px}
+#authForm label{font-size:23px;color:#8992a8}
+#authForm .field{height:80px;margin-top:10px;padding:0 22px;border-radius:20px;font-size:23px;background:#0c111c;border:2px solid #293449}
+#authSubmit{height:82px;border-radius:21px;font-size:27px;margin-top:18px}
+#authSwitchText,#authSwitch{font-size:23px}
+#authScreen> .panel >p:last-child{font-size:18px;line-height:1.8;margin-top:48px}
+#authError{font-size:16px}
+@media(max-width:640px){#authScreen{padding:22px 16px}#authScreen>.panel{padding:30px 24px 32px;border-radius:26px}#authScreen .brand{font-size:34px}#authScreen .w-12.h-12{width:76px;height:76px;font-size:31px}#authScreen .mb-7{margin-bottom:48px}#authTitle{font-size:34px}#authSubtitle{font-size:19px;margin-bottom:36px}#authForm label{font-size:19px}#authForm .field{height:68px;font-size:19px;border-radius:18px}#authSubmit{height:72px;font-size:23px}#authSwitchText,#authSwitch{font-size:18px}#authScreen> .panel >p:last-child{font-size:16px;margin-top:40px}}
+</style></head><body>
+<!-- INLOGGNING -->
+<section id="authScreen" class="min-h-screen flex items-center justify-center p-4">
+ <div class="panel p-6 md:p-8 w-full max-w-md">
+  <div class="flex items-center gap-3 mb-7"><div class="w-12 h-12 rounded-2xl grid place-items-center text-black text-xl" style="background:var(--lime)"><i class="fa-solid fa-bolt"></i></div><div><div class="brand text-2xl font-bold">CRIQUE<span class="lime">.</span></div><div class="text-xs muted tracking-widest">LEVEL UP TOGETHER</div></div></div>
+  <h1 class="text-2xl font-bold mb-2" id="authTitle">Välkommen tillbaka.</h1><p class="muted text-sm mb-6" id="authSubtitle">Logga in eller skapa ett konto för att börja samla XP tillsammans.</p>
+  <form id="authForm" class="space-y-3">
+   <label class="block text-sm muted">Användarnamn<input id="authUsername" class="field mt-1" autocomplete="username" minlength="3" maxlength="20" pattern="[A-Za-z0-9_]+" placeholder="t.ex. pelle123" required></label>
+   <label class="block text-sm muted">Lösenord<input id="authPassword" class="field mt-1" type="password" autocomplete="current-password" minlength="8" placeholder="Minst 8 tecken" required></label>
+   <div id="authError" class="text-sm text-rose-300" role="alert"></div>
+   <button id="authSubmit" class="btn btn-primary w-full" type="submit">Logga in</button>
+  </form>
+  <p class="text-sm muted text-center mt-5"><span id="authSwitchText">Har du inget konto?</span> <button id="authSwitch" class="lime font-bold">Skapa konto</button></p>
+  <p class="text-xs muted mt-6 leading-relaxed">Konton hanteras säkert av Supabase. Välj ett lösenord du inte använder någon annanstans. Användarnamnet är synligt i topplistan.</p>
+ </div>
+</section>
+<div id="app" class="hidden">
+<div class="app-shell px-4 py-5 md:px-8 md:py-7">
+<header class="flex items-center justify-between gap-3 mb-7"><div class="flex items-center gap-3"><div class="w-11 h-11 rounded-2xl grid place-items-center text-black text-xl" style="background:var(--lime)"><i class="fa-solid fa-bolt"></i></div><div><div class="brand text-xl font-bold">CRIQUE<span class="lime">.</span></div><div class="text-xs muted tracking-widest">LEVEL UP YOUR LIFE</div></div></div><div class="flex items-center gap-2"><div class="text-right hidden sm:block"><div class="text-sm font-bold" id="headerName"></div><div class="text-xs muted">Din profil</div></div><button id="logout" class="btn text-sm"><i class="fa-solid fa-arrow-right-from-bracket mr-1"></i><span class="hidden sm:inline">Logga ut</span></button></div></header>
+<nav class="panel p-1.5 flex gap-1 overflow-x-auto hide-scroll mb-6"><button class="nav-btn active" data-tab="dashboard"><i class="fa-solid fa-grid-2 mr-2"></i>Översikt</button><button class="nav-btn" data-tab="tasks"><i class="fa-solid fa-list-check mr-2"></i>Uppgifter</button><button class="nav-btn" data-tab="focus"><i class="fa-solid fa-hourglass-half mr-2"></i>Fokus</button><button class="nav-btn" data-tab="training"><i class="fa-solid fa-dumbbell mr-2"></i>Träning</button><button class="nav-btn" data-tab="strava"><i class="fa-brands fa-strava mr-2"></i>Strava & XP</button><button class="nav-btn" data-tab="leaderboard"><i class="fa-solid fa-trophy mr-2"></i>Topplista</button><button class="nav-btn" data-tab="mindset"><i class="fa-solid fa-brain mr-2"></i>Mindset</button><button class="nav-btn" data-tab="quests"><i class="fa-solid fa-person-hiking mr-2"></i>Daily Quest</button><button class="nav-btn" data-tab="bonuses"><i class="fa-solid fa-gift mr-2"></i>Bonusar</button><button class="nav-btn" data-tab="books"><i class="fa-solid fa-book mr-2"></i>Bokquiz</button></nav>
+<section id="dashboard" class="tab-content active"><div class="flex flex-wrap items-end justify-between gap-3 mb-5"><div><p class="muted text-sm" id="todayLabel">DIN DAG</p><h1 class="text-3xl md:text-4xl font-bold mt-1">Dags att bli <span class="lime">starkare.</span></h1><p class="muted mt-2">Små steg. Varje dag. Inga genvägar.</p></div><div class="tag"><i class="fa-solid fa-cloud mr-1"></i> Synkas online</div></div>
+<div class="panel p-4 mb-5 flex flex-wrap items-center justify-between gap-3"><div><div class="muted text-xs tracking-widest">DIN RANK</div><div class="text-2xl font-bold lime mt-1" id="rankName">BRONZE I</div><div class="text-xs muted mt-1" id="rankProgressText">Nästa rank</div></div><div class="text-right"><div class="text-3xl">🏆</div><div class="bar w-44 mt-2"><span id="rankBar" style="width:0%"></span></div></div></div><div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-5"><div class="panel p-4"><div class="muted text-xs">TOTAL XP</div><div class="stat lime mt-1" id="xpStat">0</div><div class="text-xs muted mt-1">Din erfarenhet</div></div><div class="panel p-4"><div class="muted text-xs">LEVEL</div><div class="stat mt-1" id="levelStat">1</div><div class="text-xs muted mt-1" id="levelName">Nybörjare</div></div><div class="panel p-4"><div class="muted text-xs">STREAK</div><div class="stat mt-1"><i class="fa-solid fa-fire lime text-xl mr-1"></i><span id="streakStat">0</span></div><div class="text-xs muted mt-1">Dagar i rad</div></div><div class="panel p-4"><div class="muted text-xs">IDAG KLART</div><div class="stat mt-1" id="doneStat">0/0</div><div class="text-xs muted mt-1">Uppgifter avklarade</div></div></div>
+<div class="grid main-grid gap-5"><div class="space-y-5"><div class="panel p-5"><div class="flex justify-between items-center gap-3 mb-4"><div><h2 class="font-bold text-lg">Dagens uppdrag</h2><p class="text-sm muted">Gör jobbet. Samla XP.</p></div><button class="btn text-sm" data-goto="tasks">Visa alla <i class="fa-solid fa-arrow-right ml-1"></i></button></div><div class="bar mb-4"><span id="dailyBar" style="width:0%"></span></div><div id="dashboardTasks" class="space-y-2"></div></div><div class="panel p-5 quote"><div class="flex gap-3"><div class="text-2xl lime"><i class="fa-solid fa-quote-left"></i></div><div><div class="text-xs tracking-widest lime font-bold mb-2">DAGENS PÅMINNELSE</div><p class="text-lg font-semibold leading-relaxed" id="dashQuote"></p><p class="muted text-xs mt-2" id="dashAuthor"></p></div></div></div></div>
+<div class="space-y-5"><div class="panel p-5"><div class="flex justify-between items-center"><h2 class="font-bold">Din progression</h2><i class="fa-solid fa-chart-line lime"></i></div><div class="flex items-center gap-4 mt-5"><div class="ring w-28 h-28 flex-none" id="levelRing"><div class="ring-inner"><div class="text-center"><div class="text-2xl font-bold" id="ringLevel">1</div><div class="text-[10px] muted">LEVEL</div></div></div></div><div class="min-w-0"><div class="font-bold" id="xpToNext">0 / 100 XP</div><p class="text-xs muted mt-1">till nästa nivå</p><div class="bar mt-3"><span id="levelBar" style="width:0%"></span></div></div></div></div><div class="panel p-5"><h2 class="font-bold text-lg mb-3">Snabbstart fokus</h2><p class="muted text-sm mb-4">En timme utan distraktioner.</p><button class="btn btn-primary w-full" id="quickFocus"><i class="fa-solid fa-play mr-2"></i>Starta 60 min</button></div><div class="panel p-5"><div class="flex justify-between mb-3"><h2 class="font-bold">Dagens träning</h2><i class="fa-solid fa-dumbbell lime"></i></div><div class="flex justify-between items-center"><span class="muted text-sm">Utmaningar klara</span><strong id="workoutCount">0/3</strong></div><div class="bar mt-3"><span id="workoutBar" style="width:0%"></span></div><button class="btn w-full mt-4 text-sm" data-goto="training">Logga träning</button></div></div></div></section>
+<section id="tasks" class="tab-content"><div class="flex flex-wrap justify-between items-end gap-3 mb-5"><div><p class="muted text-sm">DIN CHECKLISTA</p><h1 class="text-3xl font-bold">Dagens <span class="lime">uppdrag.</span></h1></div><button class="btn btn-primary" id="addTaskBtn"><i class="fa-solid fa-plus mr-2"></i>Ny uppgift</button></div><div class="flex flex-wrap gap-2 mb-4" id="categoryFilters"><button class="btn text-sm pill-active" data-filter="Alla">Alla</button><button class="btn text-sm" data-filter="Hälsa">Hälsa</button><button class="btn text-sm" data-filter="Arbete">Arbete</button><button class="btn text-sm" data-filter="Tankesätt">Tankesätt</button></div><div class="panel p-4 md:p-5"><div class="flex justify-between mb-4"><span class="muted text-sm" id="taskSummary"></span><span class="lime text-sm font-bold" id="taskXp"></span></div><div id="allTasks" class="space-y-2"></div></div></section>
+<section id="focus" class="tab-content"><div class="mb-5"><p class="muted text-sm">DJUPT ARBETE</p><h1 class="text-3xl font-bold">Fokus utan <span class="lime">brus.</span></h1></div><div class="grid md:grid-cols-2 gap-5"><div class="panel p-6 text-center"><div class="text-xs tracking-widest muted mb-3">DITT FOKUSPASS</div><div class="ring w-52 h-52 mx-auto" id="timerRing"><div class="ring-inner"><div><div class="text-5xl font-bold" id="timerDisplay">60:00</div><div class="text-xs muted mt-2" id="timerState">REDO NÄR DU ÄR</div></div></div></div><div class="flex justify-center gap-2 mt-6"><button class="btn btn-primary" id="startTimer"><i class="fa-solid fa-play mr-2"></i>Starta fokus</button><button class="btn" id="pauseTimer" disabled><i class="fa-solid fa-pause"></i></button><button class="btn" id="resetTimer"><i class="fa-solid fa-rotate-left"></i></button></div><div class="flex justify-center gap-2 mt-5"><button class="tag duration" data-min="25">25 min</button><button class="tag duration" data-min="45">45 min</button><button class="tag duration active" data-min="60">60 min</button><button class="tag duration" data-min="90">90 min</button></div><p class="text-xs muted mt-5">XP räknas på faktisk fokustid: 1 XP/minut + bonus från 25 minuter.</p></div><div id="focusProofPanel" class="panel p-5 mt-5 hidden"><h2 class="font-bold text-lg">Fokusbevis</h2><p id="focusProofSummary" class="muted text-sm mt-2"></p><form id="focusProofForm" class="space-y-3 mt-3"><label class="block text-sm muted">Bild på det du arbetade med<input id="focusProofImage" class="field mt-1" type="file" accept="image/*" required></label><label class="block text-sm muted">Beskrivning<textarea id="focusProofDescription" class="field mt-1" rows="3" required minlength="10"></textarea></label><button class="btn btn-primary w-full">Spara bildbevis</button><p id="focusProofStatus" class="text-sm muted"></p></form></div><div class="space-y-5"><div class="panel p-5"><h2 class="font-bold text-lg mb-3">Fokusregler</h2><ul class="space-y-3 text-sm muted"><li><i class="fa-solid fa-check lime mr-2"></i>Lägg mobilen utom räckhåll.</li><li><i class="fa-solid fa-check lime mr-2"></i>Stäng onödiga notiser.</li><li><i class="fa-solid fa-check lime mr-2"></i>Bestäm EN sak du ska bli klar med.</li><li><i class="fa-solid fa-check lime mr-2"></i>Ta en paus när passet är klart.</li></ul></div><div class="panel quote p-5"><p class="text-lg font-semibold" id="focusQuote"></p><p class="muted text-xs mt-2" id="focusAuthor"></p></div><div class="panel p-5"><div class="text-xs muted">GENOMFÖRDA FOKUSPASS</div><div class="stat lime mt-1" id="focusCount">0</div></div></div></div></section>
+<section id="training" class="tab-content"><div class="mb-5"><p class="muted text-sm">KROPP & ENERGI</p><h1 class="text-3xl font-bold">Träna din <span class="lime">styrka.</span></h1></div><div class="grid md:grid-cols-2 gap-5"><div class="panel p-5"><h2 class="font-bold text-lg mb-4">Dagens utmaningar</h2><div id="workoutList" class="space-y-3"></div><p class="text-xs muted mt-4">Varje utmaning ger 20 XP. Anpassa efter din nivå.</p></div><div class="panel p-5"><h2 class="font-bold text-lg mb-3">Logga egen aktivitet</h2><form id="activityForm" class="space-y-3"><label class="block text-sm muted">Aktivitet<input class="field mt-1" id="activityName" placeholder="Promenad, cykling..." required maxlength="50"></label><label class="block text-sm muted">Minuter<input class="field mt-1" id="activityMinutes" type="number" min="1" max="600" required></label><button class="btn btn-primary w-full">Spara aktivitet · +15 XP</button></form><div class="border-t border-slate-700/70 mt-5 pt-4"><h3 class="font-bold text-sm mb-3">Senaste aktiviteter</h3><div id="activityLog" class="space-y-2 text-sm muted"></div></div></div></div></section>
+
+<section id="strava" class="tab-content">
+ <div class="mb-5"><p class="muted text-sm">TRÄNINGSDATA & BELÖNINGAR</p><h1 class="text-3xl font-bold">Strava <span class="lime">XP scanner.</span></h1><p class="muted mt-2">Ladda upp en skärmbild från Strava eller din träningsklocka. Kontrollera uppgifterna innan XP delas ut.</p></div>
+ <div class="grid lg:grid-cols-2 gap-5">
+  <div class="panel p-5">
+   <div class="flex items-center gap-3 mb-4"><div class="w-11 h-11 rounded-xl grid place-items-center text-xl" style="background:#fc4c02;color:white"><i class="fa-brands fa-strava"></i></div><div><h2 class="font-bold text-lg">Läs av träningsbild</h2><p class="text-xs muted">OCR · textigenkänning i webbläsaren</p></div></div>
+   <label class="block text-sm muted">Välj skärmbild<input id="activityImage" class="field mt-2" type="file" accept="image/*"></label>
+   <img id="imagePreview" class="hidden mt-4 max-h-64 rounded-xl border border-slate-700 mx-auto" alt="Förhandsvisning av vald träningsbild">
+   <button id="scanImage" class="btn btn-primary w-full mt-4" type="button"><i class="fa-solid fa-magnifying-glass mr-2"></i>Analysera bild</button>
+   <div id="ocrStatus" class="text-sm muted mt-3" aria-live="polite">Välj en tydlig bild där distans och tid syns.</div>
+   <label class="block text-sm muted mt-4">Text som hittades (du kan rätta den)<textarea id="ocrText" class="field mt-2" rows="4" placeholder="Text från träningsbilden visas här..."></textarea></label>
+  </div>
+  <div class="panel p-5">
+   <h2 class="font-bold text-lg mb-4">Bekräfta aktiviteten</h2>
+   <form id="stravaActivityForm" class="space-y-3">
+    <label class="block text-sm muted">Aktivitetstyp<select id="stravaType" class="field mt-1"><option>Löpning</option><option>Promenad</option><option>Cykling</option><option>Vandring</option><option>Annat</option></select></label>
+    <label class="block text-sm muted">Distans (km)<input id="stravaDistance" class="field mt-1" type="number" min="0" max="300" step="0.01" placeholder="t.ex. 10"></label>
+    <label class="block text-sm muted">Tid (HH:MM:SS eller MM:SS)<input id="stravaTime" class="field mt-1" placeholder="t.ex. 00:52:30"></label>
+    <label class="block text-sm muted">Starttid (valfri)<input id="stravaStart" class="field mt-1" type="time"></label>
+    <div class="quote rounded-xl p-3"><div class="text-xs muted">FÖRVÄNTAD BELÖNING</div><div class="text-2xl font-bold lime" id="stravaXpPreview">0 XP</div><div class="text-xs muted">Beräknas från distans och aktivitetstyp. Max 200 XP per dag från bildimport.</div></div>
+    <button class="btn btn-primary w-full" type="submit">Bekräfta aktivitet & få XP</button>
+   </form>
+  </div>
+ </div>
+ <div class="panel p-5 mt-5"><h2 class="font-bold text-lg">Anslut Strava automatiskt</h2><p class="muted text-sm mt-2">Direkt Strava-synk kräver en Strava-app och en liten säker serverdel för OAuth. Den kan inte göras säkert med bara en HTML-fil eftersom Stravas client secret aldrig får ligga i en publik GitHub Pages-fil.</p><div class="flex flex-wrap gap-2 mt-4"><a class="btn" href="https://www.strava.com/settings/api" target="_blank" rel="noopener">Öppna Strava API-inställningar <i class="fa-solid fa-arrow-up-right-from-square ml-1"></i></a><span class="tag">3.0: bildimport är klar</span></div><p class="text-xs muted mt-3">Bildtolkningen är ett hjälpmedel, inte bevis på att aktiviteten är äkta. Kontrollera alltid siffrorna själv. Dela inte skärmbilder som visar hemadress eller annan privat information.</p></div>
+ <div class="panel p-5 mt-5"><h2 class="font-bold text-lg mb-3">Senaste importerade pass</h2><div id="stravaLog" class="space-y-2 text-sm muted">Inga importerade pass ännu.</div></div>
+</section>
+
+<section id="leaderboard" class="tab-content"><div class="mb-5"><p class="muted text-sm">VÄNSKAPLIG TÄVLING</p><h1 class="text-3xl font-bold">Vem går <span class="lime">all in?</span></h1><p class="muted mt-2">Synkad topplista mellan era konton.</p></div><div class="panel p-5"><div class="flex justify-between mb-5"><h2 class="font-bold text-lg">Leaderboard</h2><span class="tag">ALL TIME XP</span></div><div id="leaderboardList" class="space-y-3"></div></div></section>
+<section id="mindset" class="tab-content"><div class="mb-5"><p class="muted text-sm">MENTAL STYRKA</p><h1 class="text-3xl font-bold">Rätt tankar. <span class="lime">Rätt riktning.</span></h1></div><div class="panel quote p-7 md:p-10 mb-5"><div class="text-4xl lime mb-5"><i class="fa-solid fa-quote-left"></i></div><p class="text-2xl md:text-3xl font-semibold leading-snug" id="bigQuote"></p><div class="muted mt-4" id="bigAuthor"></div><button class="btn mt-7" id="newQuote"><i class="fa-solid fa-shuffle mr-2"></i>Nytt citat</button></div><div class="grid md:grid-cols-3 gap-3"><div class="panel p-5"><i class="fa-solid fa-seedling lime text-xl"></i><h3 class="font-bold mt-3">Börja litet</h3><p class="muted text-sm mt-2">En liten handling idag är bättre än en perfekt plan imorgon.</p></div><div class="panel p-5"><i class="fa-solid fa-repeat lime text-xl"></i><h3 class="font-bold mt-3">Var konsekvent</h3><p class="muted text-sm mt-2">Bygg vanor som hjälper dig även när motivationen sviktar.</p></div><div class="panel p-5"><i class="fa-solid fa-heart lime text-xl"></i><h3 class="font-bold mt-3">Återhämtning räknas</h3><p class="muted text-sm mt-2">Sömn, vila och balans är också utveckling.</p></div></div></section>
+<footer class="text-center muted text-xs py-8">CRIQUE · BYGG VANOR, INTE BARA MÅL · Data synkas via Supabase.</footer></div></div>
+
+<section id="quests" class="tab-content">
+ <div class="mb-5"><p class="muted text-sm">SAMMA UTMANING FÖR ALLA</p><h1 class="text-3xl font-bold">Daily <span class="lime">Quest.</span></h1></div>
+ <div class="panel p-5 mb-5"><div class="tag mb-3" id="questDate"></div><h2 class="text-2xl font-bold lime" id="dailyQuestTitle">Dagens utmaning</h2><p class="muted mt-2" id="dailyQuestDesc"></p><form id="questForm" class="space-y-3 mt-4"><label class="block text-sm muted">Bild från uppdraget<input class="field mt-1" id="questImage" type="file" accept="image/*" required></label><img id="questPreview" class="hidden rounded-xl max-h-64 object-contain" alt="Förhandsvisning"><label class="block text-sm muted">Beskriv vad bilden visar<textarea class="field mt-1" id="questDescription" rows="3" maxlength="500" required></textarea></label><button class="btn" type="button" id="questScan">Analysera bild</button><p id="questScanStatus" class="text-sm muted" aria-live="polite"></p><button class="btn btn-primary w-full" type="submit">Skicka in till granskning</button></form><p class="text-xs muted mt-3">OCR kontrollerar ledtrådar i bilden. Det är inte säker AI-bildförståelse. Beviset sparas som väntande och XP delas ut först efter granskning.</p></div>
+ <div class="panel p-5"><h2 class="font-bold mb-2">Så fungerar dagens uppdrag</h2><p class="muted text-sm">Uppdraget väljs med dagens datum som seed, så alla inloggade får samma uppdrag den dagen.</p></div>
+</section>
+<section id="bonuses" class="tab-content">
+ <div class="mb-5"><p class="muted text-sm">VECKANS EXTRA XP</p><h1 class="text-3xl font-bold">Bonusar <span class="lime">& bevis.</span></h1></div>
+ <div class="grid md:grid-cols-2 gap-5">
+  <div class="panel p-5"><h2 class="font-bold text-lg">Skärmtid · Underdog Bonus</h2><p class="muted text-sm mt-2">Ladda upp veckans skärmtidsbild. När gruppens bidrag finns kan lägsta rapporterade tid få +10 XP.</p><form id="screenTimeForm" class="space-y-3 mt-4"><label class="block text-sm muted">Skärmdump<input id="screenTimeImage" class="field mt-1" type="file" accept="image/*" required></label><label class="block text-sm muted">Total skärmtid i minuter<input id="screenTimeMinutes" class="field mt-1" type="number" min="0" max="10080" required placeholder="t.ex. 245"></label><button class="btn" type="button" id="screenTimeScan">Läs av bild (OCR)</button><p id="screenTimeStatus" class="text-sm muted"></p><button class="btn btn-primary w-full">Skicka veckans skärmtid</button></form><p class="text-xs muted mt-3">Bonusen kan räknas först när flera personer skickat in samma vecka. En skärmdump verifierar inte automatiskt att den är äkta.</p></div>
+  <div class="panel p-5"><h2 class="font-bold text-lg">Duolingo · Pure Streak</h2><p class="muted text-sm mt-2">Veckobonus +25 XP för 7 dagar, upp till +50 XP vid längre streak enligt reglerna.</p><form id="duoForm" class="space-y-3 mt-4"><label class="block text-sm muted">Duolingo-skärmdump<input id="duoImage" class="field mt-1" type="file" accept="image/*" required></label><label class="block text-sm muted">Streak (dagar)<input id="duoDays" class="field mt-1" type="number" min="0" max="9999" required placeholder="t.ex. 14"></label><label class="block text-sm muted">Har du använt streak freeze senaste 7 dagarna?<select id="duoFreeze" class="field mt-1"><option value="unknown">Jag vet inte / kan inte bevisa det</option><option value="no">Nej</option><option value="yes">Ja</option></select></label><button type="button" class="btn" id="duoScan">Läs av bild (OCR)</button><p id="duoStatus" class="text-sm muted"></p><button class="btn btn-primary w-full">Skicka för granskning</button></form><p class="text-xs muted mt-3">En vanlig streak-skärmdump kan inte bevisa att freeze inte använts. Därför hamnar bidraget i väntande granskning, inte automatisk belöning.</p></div>
+ </div>
+ <div class="panel p-5 mt-5"><h2 class="font-bold mb-3">Dina inskickade bonusbevis</h2><div id="bonusLog" class="space-y-2 text-sm muted">Inga bevis ännu.</div></div>
+</section>
+<section id="books" class="tab-content">
+ <div class="mb-5"><p class="muted text-sm">LÄS · MINNS · LEVEL UP</p><h1 class="text-3xl font-bold">Bok <span class="lime">recap quiz.</span></h1></div>
+ <div class="panel p-5"><p class="muted text-sm mb-4">Skriv in dina anteckningar eller en sammanfattning av kapitlet. Crique skapar fem övningsfrågor lokalt från texten. Riktig AI-generering kräver en säker server/API-nyckel och ingår inte i en fristående HTML-fil.</p><form id="bookForm" class="space-y-3"><label class="block text-sm muted">Bokens namn<input id="bookName" class="field mt-1" required maxlength="100" placeholder="Bokens titel"></label><label class="block text-sm muted">Kapitel<input id="bookChapter" class="field mt-1" required maxlength="100" placeholder="Kapitel 3"></label><label class="block text-sm muted">Dina anteckningar / sammanfattning<textarea id="bookNotes" class="field mt-1" rows="6" required minlength="100" maxlength="12000" placeholder="Klistra in dina egna anteckningar här..."></textarea></label><button class="btn btn-primary w-full">Skapa 5 frågor</button></form><div id="bookQuiz" class="mt-5 space-y-4"></div><p id="bookStatus" class="text-sm muted mt-3"></p></div>
+</section>
+
+<div id="focusOverlay" class="focus-mode"><div class="max-w-2xl w-full"><div class="flex justify-between text-xs tracking-[.25em] muted mb-12"><span><i class="fa-solid fa-lock lime mr-2"></i>FOKUSLÄGE</span><span id="overlayDuration">60 MINUTER</span></div><div class="text-xs tracking-[.3em] lime mb-3">EN SAK I TAGET</div><div class="focus-time" id="overlayTimer">60:00</div><p class="muted mt-4">Andas. Fokusera. Fortsätt.</p><div class="max-w-md mx-auto quote rounded-2xl p-5 mt-10"><p class="text-lg font-semibold" id="overlayQuote"></p></div><div class="flex justify-center gap-3 mt-10"><button class="btn" id="overlayPause">Pausa</button><button class="btn" id="exitFocus">Avsluta läge</button></div><p class="text-xs muted mt-5">Webbläsarfokus – låser inte telefonen eller andra appar.</p></div></div>
+<div id="toast" class="toast"></div>
+<div id="taskModal" class="fixed inset-0 z-[70] hidden items-center justify-center bg-black/70 p-4"><div class="panel p-5 w-full max-w-md"><div class="flex justify-between mb-4"><h2 class="font-bold text-lg">Skapa uppgift</h2><button id="closeTask" class="muted"><i class="fa-solid fa-xmark"></i></button></div><form id="taskForm" class="space-y-3"><input id="newTaskName" class="field" placeholder="Vad vill du göra?" required maxlength="70"><select id="newTaskCategory" class="field"><option>Hälsa</option><option>Arbete</option><option>Tankesätt</option></select><select id="newTaskXp" class="field"><option value="10">10 XP · Enkel</option><option value="20">20 XP · Normal</option><option value="30">30 XP · Utmanande</option></select><button class="btn btn-primary w-full">Lägg till uppgift</button></form></div></div>
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+<script>
+// 1. KListra in dina två värden från Supabase här:
+// Supabase-konfiguration – klistra in projektets URL och anon/public key här.
+const SUPABASE_URL = "https://nryiprvcbjlonrfkrist.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_SHZYNb_zPoFtbG4lCx-r7w_fEsENS7V";
+// ------------------------------------------------
+const $=id=>document.getElementById(id),today=()=>new Date().toLocaleDateString('sv-SE');
+const sbReady=SUPABASE_URL.startsWith('https://')&&!SUPABASE_URL.includes('DIN_')&&SUPABASE_ANON_KEY.length>30&&!SUPABASE_ANON_KEY.includes('DIN_');
+let sb=null,user=null,profile=null,authMode='login',filter='Alla',duration=60,remaining=3600,timerId=null,running=false,quoteIndex=0;
+const quotes=[['Disciplin är att välja det du vill mest framför det du vill just nu.','Dagens påminnelse'],['Du behöver inte se hela trappan. Ta första steget.','Dagens påminnelse'],['Framsteg, inte perfektion.','Dagens påminnelse'],['Det blir lättare när du börjar – inte innan.','Dagens påminnelse'],['Små dagliga förbättringar leder till stora resultat.','Dagens påminnelse'],['Fokusera på det du kan påverka och släpp resten.','Dagens påminnelse'],['Du bygger självförtroende genom att hålla löften till dig själv.','Dagens påminnelse']];
+const defaultTasks=[{id:'water',name:'Drick ett glas vatten på morgonen',cat:'Hälsa',xp:10},{id:'move',name:'Rör på dig i minst 20 minuter',cat:'Hälsa',xp:20},{id:'sleep',name:'Planera en bra läggtid',cat:'Hälsa',xp:10},{id:'focus',name:'Fokusera 25 minuter på en viktig sak',cat:'Arbete',xp:20},{id:'learn',name:'Lär dig något nytt i 15 minuter',cat:'Tankesätt',xp:20},{id:'journal',name:'Skriv en sak du är tacksam för',cat:'Tankesätt',xp:10}];
+const workouts=[{id:'walk',name:'Promenad eller cykling',detail:'20 minuter i ditt eget tempo'},{id:'stretch',name:'Rörlighet och stretch',detail:'5–10 minuter, utan att pressa'},{id:'strength',name:'Styrkeutmaning',detail:'Välj en lagom övning och gör 2 set'}];
+function freshData(){return {xp:0,streak:0,last_active:null,done:{},tasks:defaultTasks,workouts:{},activities:[],focus_count:0}}
+function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function toast(m){$('toast').textContent=m;$('toast').classList.add('show');setTimeout(()=>$('toast').classList.remove('show'),2300)}
+function levelInfo(x){let level=Math.floor(x/100)+1;return {level,into:x%100,name:level<3?'Nybörjare':level<6?'På gång':level<10?'Disciplinerad':level<20?'Elite':'Legend'}}
+const ranks=[
+ {name:'BRONZE I',min:0},{name:'BRONZE II',min:150},{name:'BRONZE III',min:300},
+ {name:'SILVER I',min:500},{name:'SILVER II',min:750},{name:'SILVER III',min:1000},
+ {name:'GOLD I',min:1500},{name:'GOLD II',min:2000},{name:'GOLD III',min:2500},
+ {name:'PLATINUM I',min:3000},{name:'PLATINUM II',min:3600},{name:'PLATINUM III',min:4300},
+ {name:'DIAMOND I',min:5000},{name:'DIAMOND II',min:5800},{name:'DIAMOND III',min:6700},
+ {name:'ELITE',min:7500},{name:'CHAMPION',min:10000},{name:'UNREAL',min:15000}
+];
+function rankInfo(x){let i=0;for(let j=0;j<ranks.length;j++)if(x>=ranks[j].min)i=j;let cur=ranks[i],next=ranks[i+1];return {cur,next,pct:next?Math.max(0,Math.min(100,(x-cur.min)/(next.min-cur.min)*100)):100}}
+function renderRank(){let r=rankInfo(profile.xp);$('rankName').textContent=r.cur.name;$('rankProgressText').textContent=r.next?(r.next.min-profile.xp)+' XP till '+r.next.name:'Högsta rank uppnådd';$('rankBar').style.width=r.pct+'%'}
+
+function usernameEmail(n){return n.toLowerCase()+'@crique-login.invalid'}
+function showAuth(){ $('authScreen').classList.remove('hidden');$('app').classList.add('hidden') }
+function showApp(){ $('authScreen').classList.add('hidden');$('app').classList.remove('hidden') }
+function setAuthMode(mode){authMode=mode;$('authTitle').textContent=mode==='login'?'Välkommen tillbaka.':'Skapa ditt konto.';$('authSubtitle').textContent=mode==='login'?'Logga in för att fortsätta samla XP.':'Välj ett användarnamn och lösenord.';$('authSubmit').textContent=mode==='login'?'Logga in':'Skapa konto';$('authSwitchText').textContent=mode==='login'?'Har du inget konto?':'Har du redan ett konto?';$('authSwitch').textContent=mode==='login'?'Skapa konto':'Logga in';$('authError').textContent=''}
+$('authSwitch').onclick=()=>setAuthMode(authMode==='login'?'signup':'login');
+async function authSubmit(e){e.preventDefault();$('authError').textContent='';if(!sb){$('authError').textContent='Supabase är inte inställt ännu. Följ installationsstegen och klistra in projektets URL och anon key i koden.';return}
+let name=$('authUsername').value.trim(),pass=$('authPassword').value;if(!/^[a-zA-Z0-9_]{3,20}$/.test(name)){$('authError').textContent='Användarnamn: 3–20 tecken, endast bokstäver, siffror och _. ';return}if(pass.length<8){$('authError').textContent='Lösenordet måste vara minst 8 tecken.';return}
+$('authSubmit').disabled=true;$('authSubmit').textContent='Vänta...';
+try{
+ let res=authMode==='signup'?await sb.auth.signUp({email:usernameEmail(name),password:pass,options:{data:{username:name}}}):await sb.auth.signInWithPassword({email:usernameEmail(name),password:pass});
+ if(res.error)throw res.error;if(authMode==='signup'&&!res.data.session){throw new Error('Kontot skapades, men Supabase väntar på e-postbekräftelse. Stäng av e-postbekräftelse i Supabase Auth-inställningarna och försök igen.')}
+ user=res.data.user;await ensureProfile(name);await loadProfile();showApp();toast('Välkommen, '+profile.username+'!');await render();
+}catch(err){$('authError').textContent=err.message||'Något gick fel.'}finally{$('authSubmit').disabled=false;$('authSubmit').textContent=authMode==='login'?'Logga in':'Skapa konto'}}
+$('authForm').addEventListener('submit',authSubmit);
+async function ensureProfile(name){let {data,error}=await sb.from('crique_players').select('*').eq('user_id',user.id).maybeSingle();if(error)throw error;if(!data){let row={user_id:user.id,username:name,...freshData()};let r=await sb.from('crique_players').insert(row).select().single();if(r.error)throw r.error;data=r.data}profile=data}
+async function loadProfile(){let {data,error}=await sb.from('crique_players').select('*').eq('user_id',user.id).single();if(error)throw error;profile=data;profile.tasks=profile.tasks||defaultTasks;profile.done=profile.done||{};profile.workouts=profile.workouts||{};profile.activities=profile.activities||[];let fd=profile.feature_data||{};profile.featureProofs=fd.featureProofs||[];profile.focusSessions=fd.focusSessions||[];profile.bonusClaims=fd.bonusClaims||{};profile.bookQuizzes=fd.bookQuizzes||[]}
+let saveTimer=null;function saveSoon(){clearTimeout(saveTimer);saveTimer=setTimeout(saveRemote,350)}
+async function saveRemote(){if(!user||!profile)return;let fields={username:profile.username,xp:profile.xp,streak:profile.streak,last_active:profile.last_active,done:profile.done,tasks:profile.tasks,workouts:profile.workouts,activities:profile.activities,focus_count:profile.focus_count,feature_data:{featureProofs:profile.featureProofs||[],focusSessions:profile.focusSessions||[],bonusClaims:profile.bonusClaims||{},bookQuizzes:profile.bookQuizzes||[]},updated_at:new Date().toISOString()};let {error}=await sb.from('crique_players').update(fields).eq('user_id',user.id);if(error)toast('Kunde inte synka: '+error.message)}
+async function updateLeaderboard(){let {data,error}=await sb.from('crique_players').select('username,xp,streak').order('xp',{ascending:false}).limit(50);if(error)throw error;$('leaderboardList').innerHTML=(data||[]).map((x,i)=>`<div class="flex items-center gap-3 p-3 rounded-xl ${x.username===profile.username?'bg-slate-700/30 border border-lime-400/20':'bg-slate-900/40'}"><div class="w-9 h-9 rounded-xl grid place-items-center font-bold ${i===0?'text-black':'text-slate-300'}" style="${i===0?'background:var(--lime)':'background:#273247'}">${i+1}</div><div class="avatar">${esc(x.username.slice(0,1).toUpperCase())}</div><div class="flex-1"><div class="font-bold">${esc(x.username)} ${x.username===profile.username?'<span class="tag ml-1">DU</span>':''}</div><div class="text-xs muted">Level ${levelInfo(x.xp).level} · ${x.streak} dagars streak</div></div><div class="font-bold lime">${x.xp} XP</div></div>`).join('')||'<p class="muted">Inga konton ännu.</p>'}
+function dayData(){if(!profile.done[today()])profile.done[today()]={};return profile.done[today()]}
+function isDone(id){return !!dayData()[id]}
+function updateActivity(){let t=today();if(profile.last_active!==t){if(profile.last_active){let y=new Date();y.setDate(y.getDate()-1);profile.streak=profile.last_active===y.toLocaleDateString('sv-SE')?profile.streak+1:1}else profile.streak=1;profile.last_active=t}}
+function addXP(n,why){profile.xp+=n;updateActivity();saveSoon();render();toast('+'+n+' XP · '+why)}
+function taskMarkup(t){let done=isDone(t.id);return `<div class="task ${done?'done':''}"><button class="check" data-check="${esc(t.id)}">${done?'<i class="fa-solid fa-check"></i>':''}</button><div class="flex-1 min-w-0"><div class="task-title font-semibold text-sm">${esc(t.name)}</div><div class="flex gap-2 mt-1"><span class="tag">${esc(t.cat)}</span><span class="tag lime">+${t.xp} XP</span></div></div><button class="muted text-sm px-2" data-delete="${esc(t.id)}"><i class="fa-solid fa-trash"></i></button></div>`}
+function renderTasks(){let ts=profile.tasks||defaultTasks,done=ts.filter(t=>isDone(t.id)).length;let filtered=ts.filter(t=>filter==='Alla'||t.cat===filter);$('allTasks').innerHTML=filtered.map(taskMarkup).join('')||'<p class="muted text-sm py-5 text-center">Inga uppgifter här ännu.</p>';$('dashboardTasks').innerHTML=ts.slice(0,4).map(taskMarkup).join('');$('taskSummary').textContent=done+' av '+ts.length+' uppgifter klara';$('taskXp').textContent='+'+ts.filter(t=>isDone(t.id)).reduce((a,t)=>a+t.xp,0)+' XP idag';$('doneStat').textContent=done+'/'+ts.length;$('dailyBar').style.width=(ts.length?done/ts.length*100:0)+'%'}
+function renderWorkout(){let done=profile.workouts[today()]||{};$('workoutList').innerHTML=workouts.map(w=>`<div class="task ${done[w.id]?'done':''}"><button class="check" data-workout="${w.id}">${done[w.id]?'<i class="fa-solid fa-check"></i>':''}</button><div class="flex-1"><div class="task-title font-semibold text-sm">${w.name}</div><div class="text-xs muted mt-1">${w.detail}</div></div><span class="tag lime">+20 XP</span></div>`).join('');let n=workouts.filter(w=>done[w.id]).length;$('workoutCount').textContent=n+'/3';$('workoutBar').style.width=n/3*100+'%';$('activityLog').innerHTML=(profile.activities||[]).slice(-5).reverse().map(a=>`<div class="flex justify-between"><span>${esc(a.name)} · ${a.minutes} min</span><span class="lime">+15 XP</span></div>`).join('')||'Inga aktiviteter loggade ännu.'}
+function setQuote(){quoteIndex=Math.floor(Date.now()/86400000)%quotes.length;let q=quotes[quoteIndex];$('dashQuote').textContent='“'+q[0]+'”';$('dashAuthor').textContent='— '+q[1];$('focusQuote').textContent='“'+q[0]+'”';$('focusAuthor').textContent='— '+q[1];$('bigQuote').textContent='“'+q[0]+'”';$('bigAuthor').textContent='— '+q[1];$('overlayQuote').textContent='“'+q[0]+'”'}
+async function render(){if(!profile)return;let lv=levelInfo(profile.xp);$('headerName').textContent=profile.username;$('xpStat').textContent=profile.xp.toLocaleString('sv-SE');$('levelStat').textContent=lv.level;$('levelName').textContent=lv.name;$('streakStat').textContent=profile.streak;$('ringLevel').textContent=lv.level;$('xpToNext').textContent=lv.into+' / 100 XP';$('levelBar').style.width=lv.into+'%';$('levelRing').style.setProperty('--progress',lv.into*3.6+'deg');$('focusCount').textContent=profile.focus_count;$('todayLabel').textContent=new Intl.DateTimeFormat('sv-SE',{weekday:'long',day:'numeric',month:'long'}).format(new Date()).toUpperCase();renderTasks();renderWorkout();renderRank();renderStravaLog();setQuote();try{await updateLeaderboard()}catch(e){console.error(e);toast('Kunde inte läsa topplistan')}}
+function switchTab(tab){document.querySelectorAll('.tab-content').forEach(x=>x.classList.toggle('active',x.id===tab));document.querySelectorAll('.nav-btn').forEach(x=>x.classList.toggle('active',x.dataset.tab===tab));if(tab==='leaderboard')updateLeaderboard().catch(e=>toast(e.message));if(tab==='strava'&&profile)renderStravaLog();window.scrollTo({top:0,behavior:'smooth'})}
+document.querySelectorAll('.nav-btn').forEach(b=>b.onclick=()=>switchTab(b.dataset.tab));document.querySelectorAll('[data-goto]').forEach(b=>b.onclick=()=>switchTab(b.dataset.goto));
+$('categoryFilters').onclick=e=>{let b=e.target.closest('[data-filter]');if(!b)return;filter=b.dataset.filter;document.querySelectorAll('[data-filter]').forEach(x=>x.classList.toggle('pill-active',x===b));renderTasks()};
+document.addEventListener('click',e=>{let c=e.target.closest('[data-check]');if(c){let id=c.dataset.check,t=profile.tasks.find(x=>x.id===id);if(!t)return;if(!isDone(id)){dayData()[id]=true;addXP(t.xp,'uppgift avklarad')}else{delete dayData()[id];profile.xp=Math.max(0,profile.xp-t.xp);saveSoon();render();toast('Uppgiften avmarkerad')}return}let d=e.target.closest('[data-delete]');if(d){profile.tasks=profile.tasks.filter(x=>x.id!==d.dataset.delete);saveSoon();render();return}let w=e.target.closest('[data-workout]');if(w){let obj=profile.workouts[today()]||(profile.workouts[today()]={}),id=w.dataset.workout;if(!obj[id]){obj[id]=true;addXP(20,'träningsutmaning')}else{delete obj[id];profile.xp=Math.max(0,profile.xp-20);saveSoon();render();toast('Utmaningen avmarkerad')}}});
+$('addTaskBtn').onclick=()=>{$('taskModal').classList.replace('hidden','flex');$('newTaskName').focus()};$('closeTask').onclick=()=> $('taskModal').classList.replace('flex','hidden');$('taskForm').onsubmit=e=>{e.preventDefault();profile.tasks.push({id:'custom_'+Date.now(),name:$('newTaskName').value.trim(),cat:$('newTaskCategory').value,xp:Number($('newTaskXp').value)});saveSoon();render();e.target.reset();$('taskModal').classList.replace('flex','hidden');toast('Uppgift tillagd')};
+$('activityForm').onsubmit=e=>{e.preventDefault();profile.activities=profile.activities||[];profile.activities.push({name:$('activityName').value.trim(),minutes:Number($('activityMinutes').value),date:today()});addXP(15,'aktivitet loggad');e.target.reset()};
+$('newQuote').onclick=()=>{quoteIndex=(quoteIndex+1)%quotes.length;$('bigQuote').textContent='“'+quotes[quoteIndex][0]+'”';$('bigAuthor').textContent='— '+quotes[quoteIndex][1]};
+function fmt(s){return String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0')}function timerUI(){let t=fmt(remaining);$('timerDisplay').textContent=t;$('overlayTimer').textContent=t;let pct=(duration*60-remaining)/(duration*60)*100;$('timerRing').style.setProperty('--progress',pct*3.6+'deg');$('timerState').textContent=running?'FOKUS PÅGÅR':remaining===duration*60?'REDO NÄR DU ÄR':'PAUSAD'}
+function setRunning(v){running=v;$('startTimer').disabled=v;$('pauseTimer').disabled=!v;$('overlayPause').textContent=v?'Pausa':'Fortsätt';$('startTimer').textContent=v?'Pågår':'Starta fokus';timerUI()}
+function startTimer(){if(running)return;setRunning(true);$('focusOverlay').classList.add('show');$('overlayDuration').textContent=duration+' MINUTER';if(timerId)clearInterval(timerId);timerId=setInterval(()=>{remaining--;timerUI();if(remaining<=0){clearInterval(timerId);timerId=null;setRunning(false);$('focusOverlay').classList.remove('show');profile.focus_count++;addXP(100,'fokuspass slutfört');remaining=duration*60;timerUI()}},1000)}
+function pauseTimer(){if(timerId)clearInterval(timerId);timerId=null;setRunning(false)}function resetTimer(){pauseTimer();remaining=duration*60;$('focusOverlay').classList.remove('show');timerUI()}
+$('startTimer').onclick=startTimer;$('quickFocus').onclick=()=>{duration=60;resetTimer();switchTab('focus');startTimer()};$('pauseTimer').onclick=pauseTimer;$('overlayPause').onclick=()=>running?pauseTimer():startTimer();$('resetTimer').onclick=resetTimer;$('exitFocus').onclick=()=>$('focusOverlay').classList.remove('show');document.querySelectorAll('.duration').forEach(b=>b.onclick=()=>{if(running)return;duration=Number(b.dataset.min);document.querySelectorAll('.duration').forEach(x=>x.classList.toggle('active',x===b));remaining=duration*60;timerUI()});
+$('logout').onclick=async()=>{await saveRemote();await sb.auth.signOut();user=null;profile=null;showAuth();setAuthMode('login')};
+
+// Crique 3.0 – träningsbild/OCR. Aktiviteten måste alltid bekräftas av användaren.
+function estimatedActivityXP(type,km,start){
+ let base=type==='Cykling'?Math.round(km*5):type==='Promenad'?Math.round(km*8):type==='Vandring'?Math.round(km*9):Math.round(km*15);
+ if(start && start<'05:30') base+=20;
+ return Math.max(5,Math.min(200,base));
+}
+function refreshStravaPreview(){let km=Number($('stravaDistance').value)||0;let xp=km>0?estimatedActivityXP($('stravaType').value,km,$('stravaStart').value):0;$('stravaXpPreview').textContent=xp+' XP';}
+['stravaDistance','stravaType','stravaStart'].forEach(id=>$(id).addEventListener('input',refreshStravaPreview));
+$('activityImage').addEventListener('change',e=>{let f=e.target.files[0];if(!f)return;if(!f.type.startsWith('image/')){toast('Välj en bildfil.');return}let u=URL.createObjectURL(f);$('imagePreview').src=u;$('imagePreview').classList.remove('hidden');$('ocrStatus').textContent='Bild vald. Tryck på Analysera bild.'});
+function parseOcr(text){
+ let s=text.replace(/,/g,'.');
+ let km=[...s.matchAll(/(\d{1,3}(?:\.\d{1,2})?)\s*(?:km|kilometers?|kilometer)\b/ig)].map(m=>Number(m[1])).find(n=>n>0&&n<=300);
+ let timeMatch=s.match(/\b(\d{1,2}:\d{2}(?::\d{2})?)\b/);
+ if(km)$('stravaDistance').value=km;
+ if(timeMatch)$('stravaTime').value=timeMatch[1];
+ refreshStravaPreview();
+}
+$('scanImage').onclick=async()=>{
+ let f=$('activityImage').files[0];if(!f){$('ocrStatus').textContent='Välj en bild först.';return}
+ if(!window.Tesseract){$('ocrStatus').textContent='Textigenkänningen kunde inte laddas. Kontrollera internetanslutningen.';return}
+ $('scanImage').disabled=true;$('ocrStatus').textContent='Läser bilden… det kan ta en liten stund.';
+ try{let result=await Tesseract.recognize(f,'eng',{logger:m=>{if(m.status==='recognizing text')$('ocrStatus').textContent='Läser text: '+Math.round((m.progress||0)*100)+'%'}});let text=result.data.text||'';$('ocrText').value=text;parseOcr(text);$('ocrStatus').textContent='Klart! Kontrollera distansen och tiden och rätta vid behov.'}
+ catch(err){$('ocrStatus').textContent='Kunde inte läsa bilden. Skriv in distansen manuellt.';console.error(err)}
+ finally{$('scanImage').disabled=false}
+};
+$('stravaActivityForm').onsubmit=e=>{
+ e.preventDefault();let km=Number($('stravaDistance').value),type=$('stravaType').value;
+ if(!km||km<=0||km>300){toast('Fyll i en giltig distans.');return}
+ let xp=estimatedActivityXP(type,km,$('stravaStart').value);
+ let date=today();profile.activities=profile.activities||[];
+ let todayImport=profile.activities.filter(a=>a.source==='image'&&a.date===date).reduce((n,a)=>n+(a.xp||0),0);
+ xp=Math.min(xp,Math.max(0,200-todayImport));
+ if(xp<=0){toast('Du har nått dagens gräns på 200 XP från bildimport.');return}
+ let entry={name:type+' · '+km.toFixed(2)+' km',minutes:0,date,source:'image',distance:km,time:$('stravaTime').value.trim(),xp};
+ profile.activities.push(entry);profile.xp+=xp;updateActivity();saveSoon();render();renderStravaLog();toast('+'+xp+' XP · aktivitet importerad');e.target.reset();$('ocrText').value='';$('ocrStatus').textContent='Aktiviteten sparad.';refreshStravaPreview();
+};
+function renderStravaLog(){let rows=(profile.activities||[]).filter(a=>a.source==='image').slice(-8).reverse();$('stravaLog').innerHTML=rows.map(a=>`<div class="flex flex-wrap justify-between gap-2 border-b border-slate-700/50 pb-2"><span>${esc(a.name)} · ${esc(a.date)}</span><strong class="lime">+${Number(a.xp)||0} XP</strong></div>`).join('')||'Inga importerade pass ännu.'}
+
+
+// ===== CRIQUE 4.0 – tillägg som behåller tidigare funktioner =====
+const outdoorQuests = [
+ ["Gå en ny väg","Ta en bild av en stig eller gata du aldrig gått tidigare."],
+ ["Hitta något grönt","Fotografera tre olika gröna saker i naturen."],
+ ["Hitta vatten","Ta en bild av en sjö, bäck, fontän eller hav."],
+ ["Hitta ett träd","Fotografera ett träd underifrån."],
+ ["Fem minuters promenad","Gå ut i minst fem minuter och fotografera omgivningen."],
+ ["Hitta en blomma","Ta en närbild av en blomma eller växt."],
+ ["Hitta en bänk","Fotografera en bänk på en plats utomhus."],
+ ["Hitta en bro","Ta en bild av en bro eller gångbro."],
+ ["Hitta något gult","Fotografera något gult utomhus."],
+ ["Lyssna på naturen","Gå ut och fotografera platsen där du stannar och lyssnar."],
+ ["Hitta en sten","Fotografera en intressant sten eller klippa."],
+ ["Se himlen","Ta en bild av himlen utan att få med personuppgifter."],
+ ["Hitta ett moln","Fotografera ett moln med en tydlig form."],
+ ["Gå i en park","Ta en bild från en park eller grönområde."],
+ ["Hitta ett djurspår","Fotografera ett spår, fjäder eller annat tecken på djurliv."],
+ ["Hitta en cykelväg","Fotografera en cykelväg eller cykelparkering."],
+ ["Hitta en utsikt","Ta en bild av en utsikt från en säker plats."],
+ ["Hitta något runt","Fotografera ett runt föremål utomhus."],
+ ["Hitta en skylt","Ta en bild av en offentlig väg- eller parkskylt."],
+ ["Gå 500 steg","Ta en bild från platsen där du avslutar promenaden."],
+ ["Hitta mossa","Fotografera mossa eller lav på naturmaterial."],
+ ["Hitta en fågel","Fotografera en fågel på avstånd utan att störa den."],
+ ["Hitta en lekplats","Fotografera en tom lekplats."],
+ ["Hitta en trappa","Fotografera en utomhustrappa."],
+ ["Hitta en solfläck","Fotografera solljus som faller på marken eller ett träd."],
+ ["Hitta en naturlig färg","Fotografera en tydlig färg i naturen."],
+ ["Hitta en stigkorsning","Fotografera där två stigar möts."],
+ ["Hitta ett löv","Fotografera ett löv med tydliga detaljer."],
+ ["Hitta en mur","Fotografera en stenmur eller tegelmur utomhus."],
+ ["Hitta en plats att vila","Fotografera en lugn plats där man kan sitta."],
+ ["Utomhus i tio minuter","Tillbringa tio minuter ute och ta en bild av omgivningen."]
+];
+function daySeedIndex(dateStr, length){
+ let h=2166136261;for(let i=0;i<dateStr.length;i++){h^=dateStr.charCodeAt(i);h=Math.imul(h,16777619)}
+ return (h>>>0)%length;
+}
+function weekKey(){let d=new Date(),u=new Date(Date.UTC(d.getFullYear(),d.getMonth(),d.getDate()));u.setUTCDate(u.getUTCDate()+4-(u.getUTCDay()||7));let y=new Date(Date.UTC(u.getUTCFullYear(),0,1));return u.getUTCFullYear()+'-W'+String(Math.ceil((((u-y)/86400000)+1)/7)).padStart(2,'0')}
+function ensureFeatureData(){profile.featureProofs=profile.featureProofs||[];profile.focusSessions=profile.focusSessions||[];profile.bonusClaims=profile.bonusClaims||{};profile.bookQuizzes=profile.bookQuizzes||[]}
+function addFeatureProof(obj){ensureFeatureData();profile.featureProofs.push({...obj,created_at:new Date().toISOString(),status:'pending'});saveSoon();renderBonusLog()}
+function uploadProofImage(file,kind){
+ return new Promise(async(resolve,reject)=>{
+  if(!file||!file.type.startsWith('image/'))return reject(new Error('Välj en bildfil.'));
+  if(file.size>8*1024*1024)return reject(new Error('Bilden får vara högst 8 MB.'));
+  if(!sb||!user)return reject(new Error('Logga in först.'));
+  const path=user.id+'/'+kind+'/'+Date.now()+'_'+file.name.replace(/[^a-zA-Z0-9._-]/g,'_');
+  const {data,error}=await sb.storage.from('crique-proofs').upload(path,file,{upsert:false,contentType:file.type});
+  if(error)return reject(error);resolve(data.path);
+ });
+}
+async function runOCR(file,statusEl){
+ if(!window.Tesseract)throw new Error('OCR kunde inte laddas. Kontrollera internet.');
+ statusEl.textContent='Analyserar bild med OCR…';
+ const result=await Tesseract.recognize(file,'eng',{logger:m=>{if(m.status==='recognizing text')statusEl.textContent='Läser text: '+Math.round((m.progress||0)*100)+'%'}});
+ return (result.data.text||'').trim();
+}
+function showDailyQuest(){
+ const date=today(),q=outdoorQuests[daySeedIndex(date,outdoorQuests.length)];
+ $('questDate').textContent=date+' · GEMENSAMT UPPDRAG';
+ $('dailyQuestTitle').textContent=q[0];$('dailyQuestDesc').textContent=q[1];
+}
+$('questImage').addEventListener('change',e=>{let f=e.target.files[0];if(f){$('questPreview').src=URL.createObjectURL(f);$('questPreview').classList.remove('hidden')}});
+$('questScan').onclick=async()=>{try{let t=await runOCR($('questImage').files[0],$('questScanStatus'));$('questScanStatus').textContent=t?'OCR klar. Text hittad: '+t.slice(0,220):'Ingen text hittades. Beskrivningen används också vid granskningen.'}catch(e){$('questScanStatus').textContent=e.message}};
+$('questForm').onsubmit=async e=>{
+ e.preventDefault();try{let q=outdoorQuests[daySeedIndex(today(),outdoorQuests.length)],file=$('questImage').files[0],desc=$('questDescription').value.trim();
+ const ocr=await runOCR(file,$('questScanStatus'));const terms=['tree','park','sky','road','path','grass','water','flower','street','bridge','outdoor','nature','sun','cloud','bench','stone','bird','leaf','forest','trail','tree','green'];
+ const combined=(ocr+' '+desc+' '+q[0]+' '+q[1]).toLowerCase();const likelyOutdoor=terms.some(x=>combined.includes(x))||desc.length>=20;
+ const path=await uploadProofImage(file,'daily-quest');
+ addFeatureProof({type:'daily_quest',date:today(),quest:q[0],description:desc,image_path:path,ocr_excerpt:ocr.slice(0,1000),ocr_flag:likelyOutdoor?'possible_outdoor':'needs_manual_review'});
+ $('questScanStatus').textContent='Inskickat! Beviset väntar på granskning. Ingen XP delas ut automatiskt.';e.target.reset();$('questPreview').classList.add('hidden');
+ }catch(err){$('questScanStatus').textContent=err.message||'Kunde inte skicka beviset.'}
+};
+async function submitBonusProof(type,file,details,status){
+ const path=await uploadProofImage(file,type);let ocr='';
+ try{ocr=await runOCR(file,status)}catch(e){status.textContent=e.message}
+ addFeatureProof({type,...details,image_path:path,ocr_excerpt:ocr.slice(0,1200),week:weekKey()});
+ status.textContent='Inskickat för granskning. Bonusen delas inte ut förrän veckans bidrag har kontrollerats.';
+}
+$('screenTimeScan').onclick=async()=>{try{let t=await runOCR($('screenTimeImage').files[0],$('screenTimeStatus'));let m=t.match(/(\d+)\s*(h|hr|hours?)\s*(\d+)?\s*(m|min|minutes?)?/i);if(m){let mins=Number(m[1])*60+Number(m[3]||0);$('screenTimeMinutes').value=mins}$('screenTimeStatus').textContent='OCR klar. Kontrollera och rätta minuterna manuellt.'}catch(e){$('screenTimeStatus').textContent=e.message}};
+$('screenTimeForm').onsubmit=async e=>{e.preventDefault();try{await submitBonusProof('screen_time',$('screenTimeImage').files[0],{minutes:Number($('screenTimeMinutes').value)},$('screenTimeStatus'));e.target.reset()}catch(err){$('screenTimeStatus').textContent=err.message}};
+$('duoScan').onclick=async()=>{try{let t=await runOCR($('duoImage').files[0],$('duoStatus'));let m=t.match(/(\d{1,4})\s*(?:day streak|dagars streak|day|days)/i);if(m)$('duoDays').value=m[1];$('duoStatus').textContent='OCR klar. Kontrollera antal dagar. Freeze-status kan inte bevisas av OCR.'}catch(e){$('duoStatus').textContent=e.message}};
+$('duoForm').onsubmit=async e=>{e.preventDefault();let days=Number($('duoDays').value),freeze=$('duoFreeze').value;if(days<7){$('duoStatus').textContent='Du behöver minst 7 dagars streak.';return}if(freeze==='yes'){$('duoStatus').textContent='Ingen Pure Streak-bonus: freeze har använts.';return}try{let award=days>=30?50:25;await submitBonusProof('duolingo_streak',$('duoImage').files[0],{days,freeze_claim:freeze,requested_xp:award},$('duoStatus'));e.target.reset()}catch(err){$('duoStatus').textContent=err.message}};
+function renderBonusLog(){if(!profile)return;ensureFeatureData();let rows=profile.featureProofs.slice(-12).reverse();$('bonusLog').innerHTML=rows.map(x=>`<div class="flex flex-wrap justify-between gap-2 border-b border-slate-700/50 pb-2"><span>${esc(x.type)} · ${esc(x.week||x.date||'')}</span><span class="tag">${esc(x.status||'pending')}</span></div>`).join('')||'Inga bevis ännu.'}
+function awardUnderDogIfEligible(){
+ ensureFeatureData();let wk=weekKey(),all=profile.featureProofs.filter(x=>x.type==='screen_time'&&x.week===wk);
+ // Fair group comparison requires reading all players' submissions server-side. Local profile alone cannot establish the winner.
+ return all.length;
+}
+
+// Fokuspass: verklig förfluten tid, XP/minut, bonus, Wake Lock och avbrottsvarning.
+let focusStartedAt=null,focusElapsedBefore=0,focusWakeLock=null,focusProofPending=false;
+async function acquireWakeLock(){try{if('wakeLock'in navigator)focusWakeLock=await navigator.wakeLock.request('screen')}catch(e){console.warn('Wake Lock kunde inte aktiveras',e)}}
+async function releaseWakeLock(){try{if(focusWakeLock){await focusWakeLock.release();focusWakeLock=null}}catch(e){}}
+function focusElapsed(){return focusElapsedBefore+(running&&focusStartedAt?Math.floor((Date.now()-focusStartedAt)/1000):0)}
+function timerUI(){let elapsed=focusElapsed(),left=Math.max(0,duration*60-elapsed),t=fmt(left);$('timerDisplay').textContent=t;$('overlayTimer').textContent=t;let pct=Math.min(100,elapsed/(duration*60)*100);$('timerRing').style.setProperty('--progress',pct*3.6+'deg');$('timerState').textContent=running?'FOKUS PÅGÅR':elapsed===0?'REDO NÄR DU ÄR':'PAUSAD'}
+function setRunning(v){running=v;$('startTimer').disabled=v;$('pauseTimer').disabled=!v;$('overlayPause').textContent=v?'Pausa':'Fortsätt';$('startTimer').textContent=v?'Pågår':'Starta fokus';timerUI()}
+async function startTimer(){
+ if(running)return;focusStartedAt=Date.now();setRunning(true);$('focusOverlay').classList.add('show');$('overlayDuration').textContent=duration+' MINUTER';await acquireWakeLock();
+ if(timerId)clearInterval(timerId);
+ timerId=setInterval(()=>{timerUI();if(focusElapsed()>=duration*60)completeFocusSession()},500);
+}
+async function pauseTimer(){if(!running)return;focusElapsedBefore=focusElapsed();focusStartedAt=null;if(timerId)clearInterval(timerId);timerId=null;setRunning(false);await releaseWakeLock()}
+async function resetTimer(){await pauseTimer();focusElapsedBefore=0;$('focusOverlay').classList.remove('show');timerUI()}
+async function completeFocusSession(){
+ if(!running)return;let seconds=focusElapsed(),minutes=Math.floor(seconds/60);running=false;if(timerId)clearInterval(timerId);timerId=null;focusStartedAt=null;await releaseWakeLock();$('focusOverlay').classList.remove('show');
+ if(minutes<1){toast('Passet var för kort för XP.');focusElapsedBefore=0;remaining=duration*60;timerUI();return}
+ let base=minutes,bonus=minutes>=25?Math.min(20,Math.floor((minutes-25)/10)+5):0,xp=base+bonus;
+ profile.focus_count=(profile.focus_count||0)+1;ensureFeatureData();profile.focusSessions.push({date:today(),minutes,xp,verified:false});focusProofPending=true;
+ focusElapsedBefore=0;remaining=duration*60;setRunning(false);timerUI();addXP(xp,'fokuspass · '+minutes+' min');$('focusProofPanel').classList.remove('hidden');$('focusProofSummary').textContent=minutes+' minuter · grund-XP '+base+' + bonus '+bonus+' XP';toast('Pass klart! Lägg till bildbevis för extra XP.');
+}
+document.addEventListener('visibilitychange',()=>{if(document.hidden&&running){pauseTimer();focusElapsedBefore=0;remaining=duration*60;$('focusOverlay').classList.remove('show');toast('Fokuspass avbrutet: du lämnade appen. Ingen XP delas ut.')}});
+
+$('focusProofForm').onsubmit=async e=>{
+ e.preventDefault();try{let file=$('focusProofImage').files[0],desc=$('focusProofDescription').value.trim();if(!file||desc.length<10)throw new Error('Lägg till en bild och en beskrivning på minst 10 tecken.');
+ let path=await uploadProofImage(file,'focus-proof');let session=profile.focusSessions[profile.focusSessions.length-1];if(session){session.proof_path=path;session.description=desc;session.proof_status='pending'}saveSoon();$('focusProofStatus').textContent='Bildbevis sparat för granskning. Extra XP ges inte automatiskt utan säker AI-/mänsklig verifiering.';e.target.reset();
+ }catch(err){$('focusProofStatus').textContent=err.message}
+};
+
+// Quiz skapas från användarens egna anteckningar; inte ett externt AI-anrop.
+let currentBookQuestions=[];
+function makeBookQuestions(text){
+ const sentences=text.replace(/\s+/g,' ').match(/[^.!?]+[.!?]?/g)||[];const clean=sentences.map(s=>s.trim()).filter(s=>s.length>35);
+ if(clean.length<5)throw new Error('Skriv minst fem tydliga meningar i anteckningarna.');
+ return clean.slice(0,5).map((s,i)=>{let words=s.split(' '),answer=s;let distractors=clean.filter(x=>x!==s).slice(i,i+3);while(distractors.length<3)distractors.push('Detta nämns inte i dina anteckningar.');let options=[answer,...distractors].sort(()=>Math.random()-.5);return {q:'Vilket påstående återger en viktig del av dina anteckningar?',answer,options}})
+}
+$('bookForm').onsubmit=e=>{
+ e.preventDefault();try{currentBookQuestions=makeBookQuestions($('bookNotes').value);$('bookQuiz').innerHTML=currentBookQuestions.map((q,i)=>`<div class="panel p-4"><div class="text-xs lime mb-2">FRÅGA ${i+1} AV 5</div><p class="font-semibold mb-3">${esc(q.q)}</p>${q.options.map((o,j)=>`<label class="flex gap-2 items-start text-sm muted mb-2"><input type="radio" name="bookq${i}" value="${j}" class="mt-1"><span>${esc(o)}</span></label>`).join('')}</div>`).join('')+'<button class="btn btn-primary w-full" id="submitBookQuiz" type="button">Rätta quiz</button>';$('bookStatus').textContent='Fem frågor skapade från dina anteckningar.';$('submitBookQuiz').onclick=()=>{let correct=0;currentBookQuestions.forEach((q,i)=>{let chosen=document.querySelector(`input[name="bookq${i}"]:checked`);if(chosen&&q.options[Number(chosen.value)]===q.answer)correct++});if(document.querySelectorAll('#bookQuiz input:checked').length!==5){$('bookStatus').textContent='Svara på alla fem frågor först.';return}let xp=correct>=4?10:correct>=3?7:correct>=1?5:0;if(xp){profile.bookQuizzes.push({book:$('bookName').value,chapter:$('bookChapter').value,correct,xp,date:today()});addXP(xp,'bokquiz');saveSoon()}$('bookStatus').textContent='Du fick '+correct+'/5 rätt och '+xp+' XP.'};
+ }catch(err){$('bookStatus').textContent=err.message}
+};
+
+// Säkerställ feature-data vid laddning och uppdatera nya paneler.
+const originalRender = render;
+render = async function(){await originalRender();if(profile){ensureFeatureData();showDailyQuest();renderBonusLog()}};
+
+async function boot(){if(!sbReady){showAuth();$('authError').textContent='Installera först Supabase och fyll i URL + anon key längst ner i HTML-filen.';return}sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);const {data}=await sb.auth.getSession();if(data.session){user=data.session.user;try{await ensureProfile(user.user_metadata?.username||'spelare');await loadProfile();showApp();await render()}catch(e){$('authError').textContent='Kunde inte ladda profilen: '+e.message;showAuth()}}else showAuth()}
+boot().catch(e=>{console.error(e);showAuth();$('authError').textContent=e.message});
+</script></body></html>
